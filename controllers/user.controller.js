@@ -8,15 +8,16 @@ exports.readController = (req, res) => {
         error: 'User not found',
       });
     }
+    user.password = undefined;
     res.json(user);
   });
 };
 
 exports.updateController = (req, res) => {
   // console.log('UPDATE USER - req.user', req.user, 'UPDATE DATA', req.body);
-  const { name, password } = req.body;
+  const { name, password, email } = req.body;
 
-  User.findOne({ _id: req.user._id }, (err, user) => {
+  User.findOne({ email }, (err, user) => {
     if (err || !user) {
       return res.status(400).json({
         error: 'User not found',
@@ -47,6 +48,7 @@ exports.updateController = (req, res) => {
           error: 'User update failed',
         });
       }
+      updatedUser.password = undefined;
       res.json(updatedUser);
     });
   });

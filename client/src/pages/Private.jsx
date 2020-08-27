@@ -45,7 +45,7 @@ const Private = ({ history }) => {
   const handleSubmit = (e) => {
     const token = getCookie('token');
     e.preventDefault();
-    setFormData({ ...formData, textChange: 'Submitting' });
+    setFormData({ ...formData, textChange: 'Submitting...' });
     axios
       .put(
         `${process.env.REACT_APP_API_URL}/user/update`,
@@ -62,12 +62,13 @@ const Private = ({ history }) => {
       )
       .then((res) => {
         updateUser(res, () => {
-          toast.success('Profile Updated Successfully');
           setFormData({ ...formData, textChange: 'Update' });
+          toast.success('Profile Updated Successfully');
         });
       })
       .catch((err) => {
-        console.log(err.response);
+        setFormData({ ...formData, textChange: 'Update' });
+        toast.error(err.response.data.error);
       });
   };
 
