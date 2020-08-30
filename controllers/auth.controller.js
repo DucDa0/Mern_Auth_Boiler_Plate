@@ -41,7 +41,7 @@ exports.registerController = async (req, res) => {
     );
     //* email sending
     const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
+      service: 'gmail',
       auth: {
         user: process.env.NODEMAILER_EMAIL,
         pass: process.env.NODEMAILER_PASS,
@@ -60,19 +60,18 @@ exports.registerController = async (req, res) => {
       subject: 'Account activation link',
       html: content,
     };
-    transporter.sendMail(mainOptions, function (err, info) {
-      if (!err) {
-        return res
-          .json({
-            message: `An email has been sent to ${email}`,
-          })
-          .catch((err) => {
-            return res.status(400).json({
-              error: errorHandler(err),
-            });
-          });
-      }
-    });
+    transporter
+      .sendMail(mainOptions)
+      .then(() => {
+        return res.json({
+          message: `An email has been sent to ${email}`,
+        });
+      })
+      .catch((err) => {
+        return res.status(400).json({
+          error: errorHandler(err),
+        });
+      });
   }
 };
 
@@ -110,7 +109,7 @@ exports.activationController = (req, res) => {
     });
   } else {
     return res.json({
-      message: 'Error happening please try again',
+      error: 'Error happening please try again',
     });
   }
 };
@@ -207,7 +206,7 @@ exports.forgetController = (req, res) => {
 
       //* email sending
       const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
+        service: 'gmail',
         auth: {
           user: process.env.NODEMAILER_EMAIL,
           pass: process.env.NODEMAILER_PASS,
@@ -226,7 +225,7 @@ exports.forgetController = (req, res) => {
         subject: 'Password reset link',
         html: content,
       };
-      user.updateOne(
+      return user.updateOne(
         {
           resetPasswordLink: token,
         },
@@ -236,19 +235,18 @@ exports.forgetController = (req, res) => {
               error: errorHandler(err),
             });
           } else {
-            transporter.sendMail(mainOptions, function (err, info) {
-              if (!err) {
-                return res
-                  .json({
-                    message: `An email has been sent to ${email}`,
-                  })
-                  .catch((err) => {
-                    return res.json({
-                      error: errorHandler(err),
-                    });
-                  });
-              }
-            });
+            transporter
+              .sendMail(mainOptions)
+              .then(() => {
+                return res.json({
+                  message: `An email has been sent to ${email}`,
+                });
+              })
+              .catch((err) => {
+                return res.json({
+                  error: err.message,
+                });
+              });
           }
         }
       );
