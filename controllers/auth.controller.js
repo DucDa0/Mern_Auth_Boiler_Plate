@@ -68,7 +68,6 @@ exports.registerController = async (req, res) => {
           })
           .catch((err) => {
             return res.status(400).json({
-              success: false,
               error: errorHandler(err),
             });
           });
@@ -103,7 +102,6 @@ exports.activationController = (req, res) => {
             });
           } else {
             return res.json({
-              success: true,
               message: 'Actived success, you can log in now',
             });
           }
